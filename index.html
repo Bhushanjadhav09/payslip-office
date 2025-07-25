@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Payslip Generator</title>
+  
+</head>
+<body>
+  <div class="container">
+    <h2>Payslip Generator</h2>
+
+    <div class="row" style="justify-content: space-between; align-items: flex-start;">
+  <div class="col-half">
+    <label>Upload Logo:</label>
+    <input type="file" id="logoUpload" accept="image/*">
+    <img id="logoPreview" style="display:none;">
+  </div>
+  <div class="col-half" style="display: flex; flex-direction: column; align-items: flex-end;">
+    <label style="align-self: flex-end;">Payslip For the Month:</label>
+    <input class="kj" type="month" id="payslipMonth" style="width: auto;">
+  </div>
+</div>
+ <h3> Company Name <span style="color: red;">*</span></h3>
+<label>Company Name:</label>
+    <input type="text" id="companyName" value="Slicks & Salamander Global Corporation">
+
+    <label>Address:</label>
+    <input type="text" id="companyAddress" value="Tower 1, World Trade Center, Kharadi, Pune, 411057">
+
+
+
+    <h3>Employee Pay Summary<span style="color: red;"> *</span></h3>
+<div id="employeeFields">
+  <div class="row">
+    <div class="col-half">
+      <label>Employee Name :</label>
+      <input type="text" id="empName" placeholder="Eg. name">
+    </div>
+    <div class="col-half">
+      <label>Employee ID :</label>
+      <input type="text" id="empId" placeholder="Eg. 1234">
+    </div>
+    <div class="col-half">
+      <label>Pay Period :</label>
+      <input type="month" id="payPeriod" placeholder="---------, ----">
+    </div>
+    <div class="col-half">
+      <label>Paid Days :</label>
+      <input type="number" id="paidDays" placeholder="Eg. 22">
+    </div>
+    <div class="col-half">
+      <label>Loss of Pay Days :</label>
+      <input type="number" id="lopDays">
+    </div>
+    <div class="col-half">
+      <label>Pay Date :</label>
+      <input type="date" id="payDate" placeholder="dd-mm-yyyy">
+    </div>
+  </div>
+</div>
+<button class="btn" onclick="addEmployeeFieldGroup()">+ Add Another Field</button>
+
+<div class="row">
+  <div class="col-half">
+    <h3>Earnings</h3>
+    <table id="earningsTable">
+      <thead><tr><th>Earnings Type</th><th>Amount</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn" onclick="addEarningRow()">+ Add Earnings Row</button>
+    <div><strong>Total Earnings: ₹<span id="inlineTotalEarnings">0.00</span></strong></div>
+  </div>
+
+  <div class="col-half">
+    <h3>Deductions</h3>
+    <table id="deductionsTable">
+      <thead><tr><th>Deduction Type</th><th>Amount</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="btn" onclick="addDeductionRow()">+ Add Deductions Row</button>
+    <div><strong>Total Deductions: ₹<span id="inlineTotalDeductions">0.00</span></strong></div>
+  </div>
+</div>
+
+<div class="summary-wrapper">
+  <h3>Net Payable Summary</h3>
+  <hr>
+  <div class="summary">
+    <div class="summary-line"><span>Total Earnings:</span><span>₹<span id="totalEarnings">0.00</span></span></div>
+    <div class="summary-line"><span>Total Deductions:</span><span>₹<span id="totalDeductions">0.00</span></span></div>
+    <div class="summary-line green"><span>Net Total Payable:</span><span>₹<span id="netPayable">0.00</span></span></div>
+  </div>
+
+  <div class="button-group">
+    <button class="paybtn" onclick="printPayslip()">Print Payslip</button>
+    <button class="resetb" onclick="resetForm()">Reset</button>
+  </div>
+</div>
+
+
+  <script>
+    function addEarningRow() {
+      const row = `<tr>
+        <td><input type="text" class="earningType"></td>
+        <td><input type="number" class="earningAmount" oninput="calculatePayable()"></td>
+      </tr>`;
+      document.querySelector("#earningsTable tbody").insertAdjacentHTML('beforeend', row);
+    }
+
+    function addDeductionRow() {
+      const row = `<tr>
+        <td><input type="text" class="deductionType"></td>
+        <td><input type="number" class="deductionAmount" oninput="calculatePayable()"></td>
+      </tr>`;
+      document.querySelector("#deductionsTable tbody").insertAdjacentHTML('beforeend', row);
+    }
+
+    function calculatePayable() {
+      let totalEarnings = 0;
+      document.querySelectorAll('.earningAmount').forEach(input => {
+        totalEarnings += parseFloat(input.value) || 0;
+      });
+
+      let totalDeductions = 0;
+      document.querySelectorAll('.deductionAmount').forEach(input => {
+        totalDeductions += parseFloat(input.value) || 0;
+      });
+
+document.getElementById('totalEarnings').innerText = totalEarnings.toFixed(2);
+document.getElementById('inlineTotalEarnings').innerText = totalEarnings.toFixed(2);
+
+document.getElementById('totalDeductions').innerText = totalDeductions.toFixed(2);
+document.getElementById('inlineTotalDeductions').innerText = totalDeductions.toFixed(2);
+
+document.getElementById('netPayable').innerText = (totalEarnings - totalDeductions).toFixed(2);
+
+    }
+
+    function printPayslip() {
+      window.print();
+    }
+
+    function addEmployeeFieldGroup() {
+      const fields = document.getElementById('employeeFields');
+      const newGroup = document.createElement('div');
+      newGroup.className = 'col-full';
+      newGroup.innerHTML = `
+        <div class="row">
+          <div class="col-half">
+            <label>Employee Name:</label>
+            <input type="text" value="Chehan Kalai">
+          </div>
+          <div class="col-half">
+            <label>Employee ID:</label>
+            <input type="text" value="182">
+          </div>
+          <div class="col-half">
+            <label>Pay Period:</label>
+            <input type="text" value="July, 2025">
+          </div>
+          <div class="col-half">
+            <label>Paid Days:</label>
+            <input type="number" value="31">
+          </div>
+          <div class="col-half">
+            <label>Loss of Pay Days:</label>
+            <input type="number" value="1">
+          </div>
+          <div class="col-half">
+            <label>Pay Date:</label>
+            <input type="date" value="2025-08-07">
+          </div>
+        </div>
+      `; 
+      fields.appendChild(newGroup);
+    }
+
+    document.getElementById('logoUpload').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const preview = document.getElementById('logoPreview');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    addEarningRow();
+    document.querySelector('.earningType').value = 'Basic';
+    document.querySelector('.earningAmount').value = 0;
+    addEarningRow();
+    document.querySelectorAll('.earningType')[1].value = 'House Rent Allowance';
+    document.querySelectorAll('.earningAmount')[1].value =0;
+
+    addDeductionRow();
+    document.querySelector('.deductionType').value = 'Income tax';
+    document.querySelector('.deductionAmount').value = 0;
+    addDeductionRow();
+    document.querySelectorAll('.deductionType')[1].value = 'Provident Fund';
+    document.querySelectorAll('.deductionAmount')[1].value = 0;
+
+    calculatePayable();
+
+    function resetForm() {
+
+  document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="month"]').forEach(input => {
+    input.value = '';
+  });
+
+  
+  document.getElementById('companyName').value = '';
+  document.getElementById('companyAddress').value = '';
+
+
+  const logo = document.getElementById('logoPreview');
+  logo.src = '';
+  logo.style.display = 'none';
+  document.getElementById('logoUpload').value = '';
+
+ // Reset earnings values
+const earningTypes = document.querySelectorAll('.earningType');
+const earningAmounts = document.querySelectorAll('.earningAmount');
+
+if (earningTypes.length < 2) {
+  document.querySelector("#earningsTable tbody").innerHTML = '';
+  addEarningRow();
+  addEarningRow();
+}
+
+document.querySelectorAll('.earningType')[0].value = 'Basic Pay';
+document.querySelectorAll('.earningAmount')[0].value = 0;
+
+document.querySelectorAll('.earningType')[1].value = 'House Rent Allowance';
+document.querySelectorAll('.earningAmount')[1].value = 0;
+
+
+const deductionTypes = document.querySelectorAll('.deductionType');
+const deductionAmounts = document.querySelectorAll('.deductionAmount');
+
+if (deductionTypes.length < 2) {
+  document.querySelector("#deductionsTable tbody").innerHTML = '';
+  addDeductionRow();
+  addDeductionRow();
+}
+
+document.querySelectorAll('.deductionType')[0].value = 'Income Tax';
+document.querySelectorAll('.deductionAmount')[0].value = 0;
+
+document.querySelectorAll('.deductionType')[1].value = 'Provident Fund';
+document.querySelectorAll('.deductionAmount')[1].value = 0;
+
+calculatePayable();
+ 
+}
+
+  </script>
+</body>
+</html>
